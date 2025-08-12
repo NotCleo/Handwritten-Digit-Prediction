@@ -55,3 +55,7 @@ This project intentionally does NOT use any machine learning frameworks or high-
     Loss gradients
 
     Manual parameter updates
+
+
+
+Note to Self - https://www.geeksforgeeks.org/machine-learning/ml-t-distributed-stochastic-neighbor-embedding-t-sne-algorithm/, trying this to replicate
