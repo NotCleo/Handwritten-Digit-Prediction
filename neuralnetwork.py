@@ -4,12 +4,10 @@ import matplotlib.pyplot as plt
 import cv2
 import os
 
-# === Load training data ===
 train_df = pd.read_csv('train.csv')
 train_data = np.array(train_df)
 np.random.shuffle(train_data)
 
-# === Split training/dev ===
 m, n = train_data.shape
 data_dev = train_data[:1000].T
 Y_dev = data_dev[0]
@@ -20,7 +18,6 @@ Y_train = data_train[0]
 X_train = data_train[1:n] / 255.
 _, m_train = X_train.shape
 
-# === Init Weights and Biases for 4-Layer NN ===
 def init_params():
     W1 = np.random.randn(128, 784) * np.sqrt(2./784)
     b1 = np.zeros((128, 1))
@@ -33,14 +30,15 @@ def init_params():
     return W1, b1, W2, b2, W3, b3, W4, b4
 
 
-# === Activations ===
+
+
+
 def ReLU(Z): return np.maximum(0, Z)
 def ReLU_deriv(Z): return Z > 0
 def softmax(Z):
     expZ = np.exp(Z - np.max(Z, axis=0, keepdims=True))
     return expZ / np.sum(expZ, axis=0, keepdims=True)
 
-# === Forward Propagation ===
 def forward_prop(W1, b1, W2, b2, W3, b3, W4, b4, X):
     Z1 = W1 @ X + b1
     A1 = ReLU(Z1)
@@ -58,7 +56,6 @@ def one_hot(Y):
     one_hot_Y[Y, np.arange(Y.size)] = 1
     return one_hot_Y
 
-# === Backpropagation ===
 def backward_prop(Z1, A1, Z2, A2, Z3, A3, Z4, A4, W1, W2, W3, W4, X, Y):
     m = Y.size
     one_hot_Y = one_hot(Y)
@@ -80,7 +77,6 @@ def backward_prop(Z1, A1, Z2, A2, Z3, A3, Z4, A4, W1, W2, W3, W4, X, Y):
 
     return dW1, db1, dW2, db2, dW3, db3, dW4, db4
 
-# === Update Parameters ===
 def update_params(W1, b1, W2, b2, W3, b3, W4, b4,
                   dW1, db1, dW2, db2, dW3, db3, dW4, db4, alpha):
     W1 -= alpha * dW1
@@ -93,11 +89,9 @@ def update_params(W1, b1, W2, b2, W3, b3, W4, b4,
     b4 -= alpha * db4
     return W1, b1, W2, b2, W3, b3, W4, b4
 
-# === Predictions ===
 def get_predictions(A4): return np.argmax(A4, axis=0)
 def get_accuracy(preds, Y): return np.mean(preds == Y)
 
-# === Training Loop ===
 def gradient_descent(X, Y, alpha, iterations):
     W1, b1, W2, b2, W3, b3, W4, b4 = init_params()
     for i in range(iterations):
@@ -113,12 +107,10 @@ def gradient_descent(X, Y, alpha, iterations):
             print(f"Iteration {i}: Accuracy = {acc:.4f}")
     return W1, b1, W2, b2, W3, b3, W4, b4
 
-# === Predict Function ===
 def make_predictions(X, W1, b1, W2, b2, W3, b3, W4, b4):
     _, _, _, _, _, _, _, A4 = forward_prop(W1, b1, W2, b2, W3, b3, W4, b4, X)
     return get_predictions(A4)
 
-# === Predict Image Function ===
 def predict_from_image(image_path, W1, b1, W2, b2, W3, b3, W4, b4):
     if not os.path.exists(image_path):
         print(f"File not found: {image_path}")
@@ -142,13 +134,10 @@ def predict_from_image(image_path, W1, b1, W2, b2, W3, b3, W4, b4):
     plt.axis('off')
     plt.show()
 
-# === Train the model ===
 W1, b1, W2, b2, W3, b3, W4, b4 = gradient_descent(X_train, Y_train, alpha=0.2, iterations=600)
 
-# === Evaluate on dev set ===
 dev_preds = make_predictions(X_dev, W1, b1, W2, b2, W3, b3, W4, b4)
 print("Dev Set Accuracy:", get_accuracy(dev_preds, Y_dev))
 
-# === Test on an image ===
 image_path = 'test_digit.jpeg'
 predict_from_image(image_path, W1, b1, W2, b2, W3, b3, W4, b4)
